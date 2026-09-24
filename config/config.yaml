@@ -1,0 +1,49 @@
+reference: resources/reference.fa
+panel_vcf: resources/pangenome.panel.vcf
+shortread_samples: config/samples.shortread.tsv
+longread_samples: config/samples.longread.tsv
+
+output_dir: results
+work_dir: work
+log_dir: logs
+
+validation:
+  strict: true
+
+threads:
+  graph_construct: 8
+  graph_index: 8
+  shortread_index: 8
+  shortread_giraffe: 16
+  longread_autoindex: 16
+  longread_giraffe: 16
+  pack: 8
+  genotype: 8
+  vcf: 2
+
+resources:
+  validation: 1024
+  graph_construct: 32000
+  graph_index: 32000
+  shortread_index: 32000
+  shortread_giraffe: 32000
+  longread_autoindex: 64000
+  longread_giraffe: 64000
+  pack: 16000
+  genotype: 16000
+  vcf: 2048
+
+vg:
+  ploidy: 2
+
+shortread:
+  preset: default
+  min_mapq: 5
+  expected_coverage: 128
+  keep_intermediates: false
+
+longread:
+  min_mapq: 5
+  expected_coverage: 64
+  autoindex_target_mem: 64G
+  keep_intermediates: false

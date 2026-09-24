@@ -1,0 +1,8 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - vg=1.70.0
+  - bcftools>=1.20,<2
+  - htslib>=1.20,<2
+  - samtools>=1.20,<2

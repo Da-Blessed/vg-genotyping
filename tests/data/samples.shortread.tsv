@@ -1,0 +1,2 @@
+sample	read1	read2
+short_test	tests/data/short_R1.fastq	tests/data/short_R2.fastq

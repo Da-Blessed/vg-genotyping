@@ -1,0 +1,2 @@
+sample	read1	read2
+sampleA	/path/to/sampleA_R1.fastq.gz	/path/to/sampleA_R2.fastq.gz

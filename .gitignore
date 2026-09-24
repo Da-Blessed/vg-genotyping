@@ -1,0 +1,6 @@
+.snakemake/
+logs/
+results/
+work/
+__pycache__/
+*.py[cod]

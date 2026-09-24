@@ -1,0 +1,9 @@
+reference: tests/data/reference.fa
+panel_vcf: tests/data/panel.vcf
+shortread_samples: tests/data/samples.shortread.tsv
+longread_samples: tests/data/samples.longread.tsv
+output_dir: tests/output
+work_dir: tests/work
+log_dir: tests/logs
+validation:
+  strict: true

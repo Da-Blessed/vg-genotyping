@@ -1,0 +1,2 @@
+sample	read	platform
+long_test	tests/data/long.fastq	hifi

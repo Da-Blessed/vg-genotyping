@@ -1,0 +1,30 @@
+name: vg genotyping workflow CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yaml
+          cache-environment: true
+      - name: Test validator
+        shell: micromamba-shell {0}
+        run: python -m unittest discover -s tests -v
+      - name: Lint workflow
+        shell: micromamba-shell {0}
+        run: snakemake --snakefile Snakefile --configfile tests/config.yaml --lint
+      - name: Dry-run all read types
+        shell: micromamba-shell {0}
+        run: snakemake --snakefile Snakefile --configfile tests/config.yaml --cores 1 --dry-run
+      - name: Dry-run short-read only
+        shell: micromamba-shell {0}
+        run: snakemake --snakefile workflow/shortread.smk --configfile tests/config.yaml --cores 1 --dry-run
+      - name: Dry-run long-read only
+        shell: micromamba-shell {0}
+        run: snakemake --snakefile workflow/longread.smk --configfile tests/config.yaml --cores 1 --dry-run
