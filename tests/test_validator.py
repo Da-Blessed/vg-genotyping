@@ -67,6 +67,37 @@ class ValidatorTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("hifi or r10", result.stderr)
 
+    def test_missing_genotype_allowed_without_disabling_strict_checks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            panel = Path(directory) / "missing.vcf"
+            panel.write_text(PANEL.read_text().replace("0|1\t1|0", ".|.\t1|0", 1))
+            result = self.run_validator(
+                "--reference",
+                str(REFERENCE),
+                "--vcf",
+                str(panel),
+                "--panel-only",
+                "--strict",
+                "--allow-missing-genotypes",
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_unphased_called_genotype_is_rejected_when_missing_is_allowed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            panel = Path(directory) / "unphased.vcf"
+            panel.write_text(PANEL.read_text().replace("0|1\t1|0", "0/1\t1|0", 1))
+            result = self.run_validator(
+                "--reference",
+                str(REFERENCE),
+                "--vcf",
+                str(panel),
+                "--panel-only",
+                "--strict",
+                "--allow-missing-genotypes",
+            )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Unphased panel genotype", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

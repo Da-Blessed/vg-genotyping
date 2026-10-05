@@ -9,6 +9,7 @@ log_dir: logs
 
 validation:
   strict: true
+  allow_missing_genotypes: false
 
 threads:
   graph_construct: 8

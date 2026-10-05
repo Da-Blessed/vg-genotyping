@@ -7,6 +7,11 @@ rule validate_panel:
     params:
         script=str(PROJECT_ROOT / "scripts" / "validate_inputs.py"),
         strict="--strict" if config.get("validation", {}).get("strict", True) else "",
+        allow_missing=(
+            "--allow-missing-genotypes"
+            if config.get("validation", {}).get("allow_missing_genotypes", False)
+            else ""
+        ),
         outdir=lambda wildcards, output: str(Path(output[0]).parent),
         logdir=f"{LOG_DIR}/validation",
     log:
@@ -21,7 +26,7 @@ rule validate_panel:
         python {params.script:q} \
             --reference {input.reference:q} \
             --vcf {input.vcf:q} \
-            --panel-only {params.strict} > {log:q} 2>&1
+            --panel-only {params.strict} {params.allow_missing} > {log:q} 2>&1
         """
 
 
@@ -44,6 +49,11 @@ rule validate_shortread_inputs:
     params:
         script=str(PROJECT_ROOT / "scripts" / "validate_inputs.py"),
         strict="--strict" if config.get("validation", {}).get("strict", True) else "",
+        allow_missing=(
+            "--allow-missing-genotypes"
+            if config.get("validation", {}).get("allow_missing_genotypes", False)
+            else ""
+        ),
         outdir=lambda wildcards, output: str(Path(output[0]).parent),
         logdir=f"{LOG_DIR}/validation",
     log:
@@ -59,7 +69,7 @@ rule validate_shortread_inputs:
             --reference {input.reference:q} \
             --vcf {input.vcf:q} \
             --samples {input.samples:q} \
-            --read-type short {params.strict} > {log:q} 2>&1
+            --read-type short {params.strict} {params.allow_missing} > {log:q} 2>&1
         """
 
 
@@ -75,6 +85,11 @@ rule validate_longread_inputs:
     params:
         script=str(PROJECT_ROOT / "scripts" / "validate_inputs.py"),
         strict="--strict" if config.get("validation", {}).get("strict", True) else "",
+        allow_missing=(
+            "--allow-missing-genotypes"
+            if config.get("validation", {}).get("allow_missing_genotypes", False)
+            else ""
+        ),
         outdir=lambda wildcards, output: str(Path(output[0]).parent),
         logdir=f"{LOG_DIR}/validation",
     log:
@@ -90,5 +105,5 @@ rule validate_longread_inputs:
             --reference {input.reference:q} \
             --vcf {input.vcf:q} \
             --samples {input.samples:q} \
-            --read-type long {params.strict} > {log:q} 2>&1
+            --read-type long {params.strict} {params.allow_missing} > {log:q} 2>&1
         """

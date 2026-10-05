@@ -128,19 +128,39 @@ def validate_samples(path: Path, read_type: str) -> int:
     return count
 
 
-def validate_gt(gt: str, sample: str, locus: str, strict: bool) -> None:
+def validate_gt(
+    gt: str,
+    sample: str,
+    locus: str,
+    strict: bool,
+    allow_missing: bool,
+) -> None:
     if not strict:
         return
     alleles = re.split(r"[|/]", gt)
-    if not alleles or any(allele == "." for allele in alleles):
+    has_missing = any(allele == "." for allele in alleles)
+    if not alleles or (has_missing and not allow_missing):
         raise ValidationError(f"Missing panel genotype for {sample} at {locus}")
-    if len(alleles) > 1 and "|" not in gt:
+    # A completely missing genotype carries no phase information. Partially
+    # called and fully called diploid genotypes must remain phased.
+    if (
+        len(alleles) > 1
+        and "|" not in gt
+        and not all(allele == "." for allele in alleles)
+    ):
         raise ValidationError(f"Unphased panel genotype for {sample} at {locus}: {gt}")
-    if not all(allele.isdigit() for allele in alleles):
+    if not all(
+        allele.isdigit() or (allow_missing and allele == ".") for allele in alleles
+    ):
         raise ValidationError(f"Invalid panel genotype for {sample} at {locus}: {gt}")
 
 
-def validate_vcf(path: Path, contigs: dict[str, int], strict: bool) -> tuple[int, int]:
+def validate_vcf(
+    path: Path,
+    contigs: dict[str, int],
+    strict: bool,
+    allow_missing: bool,
+) -> tuple[int, int]:
     require_file(path, "Panel VCF")
     if is_gzip(path):
         raise ValidationError("Provide the panel as an uncompressed VCF")
@@ -203,7 +223,7 @@ def validate_vcf(path: Path, contigs: dict[str, int], strict: bool) -> tuple[int
                 values = sample_field.split(":")
                 if gt_index >= len(values):
                     raise ValidationError(f"GT is absent for {sample} at {locus}")
-                validate_gt(values[gt_index], sample, locus, strict)
+                validate_gt(values[gt_index], sample, locus, strict, allow_missing)
             variants += 1
     if not header_seen or variants == 0:
         raise ValidationError("Panel VCF must contain a #CHROM header and variants")
@@ -218,10 +238,16 @@ def main() -> int:
     parser.add_argument("--read-type", choices=("short", "long"))
     parser.add_argument("--panel-only", action="store_true")
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--allow-missing-genotypes", action="store_true")
     args = parser.parse_args()
     try:
         contigs = read_fasta_contigs(args.reference)
-        panel_samples, variants = validate_vcf(args.vcf, contigs, args.strict)
+        panel_samples, variants = validate_vcf(
+            args.vcf,
+            contigs,
+            args.strict,
+            args.allow_missing_genotypes,
+        )
         if args.panel_only:
             target_samples = None
         else:

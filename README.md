@@ -12,6 +12,23 @@ Phased panel VCF로 variation graph를 만들고, short reads 또는 long reads�
 
 long-read Giraffe 지원은 비교적 최근에 추가되어 활발히 개발 중입니다. vg 버전과 preset을 고정하고 실제 dataset으로 정확도와 resource를 검증하는 것을 권장합니다. 이 workflow는 검증한 vg `1.70.0`의 long-read index 파일명과 CLI를 사용합니다.
 
+## Panel genotype 검증
+
+기본값인 `validation.strict: true`에서는 panel의 호출된 diploid genotype이
+phased인지, allele index가 유효한 숫자인지를 검사합니다. Missing genotype이
+있는 panel을 사용하되 나머지 strict 검사를 유지하려면 다음과 같이 설정합니다.
+
+```yaml
+validation:
+  strict: true
+  allow_missing_genotypes: true
+```
+
+이 설정은 `.|.`, `./.` 및 `0|.` 같은 missing genotype을 허용하지만, `0/1`
+같은 unphased called genotype은 계속 거부합니다. `allow_missing_genotypes`의
+기본값은 `false`입니다. VCF 정렬 순서, reference 범위, record 간 중첩 및
+sequence-resolved allele 검사는 이 옵션과 관계없이 항상 수행됩니다.
+
 ## 입력
 
 - 압축하지 않은 reference FASTA
