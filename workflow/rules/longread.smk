@@ -25,7 +25,7 @@ rule vg_longread_indexes:
         mkdir -p {params.outdir:q} {params.tmp:q} {params.logdir:q}
         vg autoindex --workflow lr-giraffe \
             --prefix {params.prefix:q} --gbz {input.gbz:q} \
-            --threads {threads} --temp-dir {params.tmp:q} \
+            --threads {threads} --tmp-dir {params.tmp:q} \
             --target-mem {params.target_mem:q} > {log:q} 2>&1
         """
 

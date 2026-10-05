@@ -14,6 +14,11 @@ PANEL = ROOT / "tests" / "data" / "panel.vcf"
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_vg_170_autoindex_uses_tmp_dir_option(self) -> None:
+        rule = (ROOT / "workflow/rules/longread.smk").read_text()
+        self.assertIn("--tmp-dir", rule)
+        self.assertNotIn("--temp-dir", rule)
+
     def run_validator(self, *arguments: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [sys.executable, str(VALIDATOR), *arguments],
